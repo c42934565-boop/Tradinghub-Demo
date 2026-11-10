@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123b78">
+  <title>TradeHub | Demo Trading</title>
+  <style>
+    :root{--navy:#102f61;--blue:#1769e0;--blue2:#eaf2ff;--ink:#14243b;--muted:#68788e;--line:#e3eaf3;--bg:#f4f7fb;--green:#138a55;--red:#cf3e4e}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+    button,input,select{font:inherit}
+    .topbar{background:linear-gradient(110deg,#0e2e61,#1769e0);color:#fff;padding:16px max(16px,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-weight:850;font-size:22px;letter-spacing:.2px}.brand span{color:#a9ceff}
+    .demo-pill{font-size:11px;font-weight:800;letter-spacing:.8px;border:1px solid #a9ceff;border-radius:30px;padding:6px 10px;color:#eaf3ff}
+    .wrap{max-width:1120px;margin:0 auto;padding:20px 16px 40px}
+    .welcome{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:4px 0 18px}
+    h1{font-size:23px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px}
+    .badge{background:#e4f7ed;color:#087747;border-radius:20px;padding:7px 10px;font-size:11px;font-weight:800}
+    .grid{display:grid;grid-template-columns:1.45fr .9fr;gap:16px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 4px 16px rgba(22,54,95,.04)}
+    .balance{background:linear-gradient(125deg,#12366e,#1b70e8);color:white;border:0}
+    .eyebrow{font-size:11px;letter-spacing:.7px;text-transform:uppercase;opacity:.78;font-weight:750}
+    .amount{font-size:31px;font-weight:850;margin:7px 0 4px;font-variant-numeric:tabular-nums}
+    .balance-note{font-size:12px;color:#d5e5ff}
+    .balance-actions{display:flex;gap:9px;margin-top:16px}
+    .btn{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer;transition:.15s}
+    .btn:active{transform:scale(.98)}
+    .btn-light{background:#fff;color:var(--navy)}.btn-ghost{background:#ffffff20;color:white;border:1px solid #ffffff65}
+    .btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:#0f56bd}
+    .btn-up{background:#e5f7ee;color:#087747;border:1px solid #b9e9d0}.btn-down{background:#fff0f1;color:#b72e40;border:1px solid #f4c6cc}
+    .section-title{font-size:15px;font-weight:800;margin:0 0 13px}
+    .market-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .live{color:var(--green);font-size:11px;font-weight:800}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#19a56b;margin-right:5px}
+    .chartbox{height:205px;background:linear-gradient(180deg,#f8fbff,#fff);border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+    canvas{width:100%;height:100%;display:block}
+    .chart-label{position:absolute;top:10px;left:12px;font-size:11px;color:var(--muted);background:#ffffffd9;padding:4px 7px;border-radius:6px}
+    .price-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .price{font-size:23px;font-weight:850;font-variant-numeric:tabular-nums}.change{font-size:12px;color:var(--green);font-weight:750}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;color:var(--muted);font-size:11px;font-weight:750;margin:0 0 6px}
+    input,select{width:100%;padding:11px 12px;border:1px solid #d9e2ee;border-radius:9px;background:#fff;color:var(--ink);outline:none}
+    input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1769e018}
+    .direction{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+    .direction button{padding:12px 8px;border-radius:10px;font-weight:800;cursor:pointer}
+    .direction button.selected{outline:2px solid var(--blue);outline-offset:1px}
+    .full{width:100%}
+    .hint{font-size:11px;color:var(--muted);line-height:1.5;margin:10px 0 0}
+    .history{margin-top:16px}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:12px;min-width:420px}
+    th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+    th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+    .win{color:var(--green);font-weight:800}.loss{color:var(--red);font-weight:800}.pending{color:#9a6a00;font-weight:800}
+    .notice{background:#fff8e7;border:1px solid #f4dfaa;color:#775414;padding:12px 13px;border-radius:11px;font-size:11px;line-height:1.5;margin-top:16px}
+    .mpesa{border:1px dashed #a9bdd7;background:#f9fbff;border-radius:12px;padding:14px}
+    .mpesa h3{margin:0 0 5px;font-size:14px}.mpesa p{font-size:11px;color:var(--muted);line-height:1.5;margin:0 0 10px}
+    .soon{display:inline-block;background:#eaf2ff;color:#1756a7;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:800}
+    .footer{text-align:center;color:#8290a3;font-size:10px;margin:22px 0 0}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#14243b;color:#fff;padding:11px 15px;border-radius:10px;font-size:12px;box-shadow:0 8px 30px #0002;display:none;z-index:5;max-width:90%;text-align:center}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:16px 12px 30px}.welcome{align-items:start}.card{padding:15px}.chartbox{height:190px}.amount{font-size:28px}}
+    @media(max-width:380px){.form-grid{grid-template-columns:1fr}.welcome h1{font-size:20px}.balance-actions .btn{flex:1;padding:10px 7px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Trade<span>Hub</span></div>
+    <div class="demo-pill">DEMO ACCOUNT · VIRTUAL FUNDS</div>
+  </header>
+
+  <main class="wrap">
+    <div class="welcome">
+      <div><h1>Trading dashboard</h1><div class="sub">Practice with virtual money. No real trades or deposits.</div></div>
+      <div class="badge">● Demo mode</div>
+    </div>
+
+    <section class="grid">
+      <div>
+        <div class="card balance">
+          <div class="eyebrow">Your virtual balance</div>
+          <div class="amount" id="balance">KSh 10,000.00</div>
+          <div class="balance-note">Practice funds only · Reset any time</div>
+          <div class="balance-actions">
+            <button class="btn btn-light" id="resetBtn">Reset demo balance</button>
+            <button class="btn btn-ghost" id="historyBtn">View history</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="market-head">
+            <div class="section-title" style="margin:0">Demo market</div>
+            <div class="live"><span class="dot"></span>SIMULATED</div>
+          </div>
+          <div class="form-grid" style="margin-bottom:12px">
+            <div><label for="asset">Select demo asset</label>
+              <select id="asset"><option value="EUR/USD">EUR/USD</option><option value="GBP/USD">GBP/USD</option><option value="USD/JPY">USD/JPY</option><option value="GOLD">GOLD</option></select>
+            </div>
+            <div><label>Market status</label><input value="Practice market" readonly></div>
+          </div>
+          <div class="chartbox"><div class="chart-label">Illustrative simulated price</div><canvas id="chart"></canvas></div>
+          <div class="price-row"><div><div class="eyebrow" style="color:var(--muted)">Current demo price</div><div class="price" id="price">1.08420</div></div><div class="change" id="change">+0.00%</div></div>
+          <p class="hint">Prices are randomly simulated in your browser. They are not live market prices and should not be used for financial decisions.</p>
+        </div>
+
+        <div class="card history" id="history">
+          <div class="section-title">Your trade history</div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Asset / Direction</th><th>Stake</th><th>Result</th><th>Status</th></tr></thead>
+              <tbody id="tradeRows"><tr><td colspan="4" style="color:#8290a3;text-align:center">No demo trades yet. Place a practice trade to begin.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card">
+          <div class="section-title">Place a demo trade</div>
+          <div><label for="stake">Practice stake (KSh)</label><input id="stake" type="number" min="10" step="10" value="100"></div>
+          <div class="form-grid" style="margin-top:11px">
+            <div><label for="duration">Trade duration</label><select id="duration"><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">1 minute</option></select></div>
+            <div><label for="payout">Illustrative payout</label><input id="payout" value="80% (demo)" readonly></div>
+          </div>
+          <div class="direction">
+            <button type="button" class="btn btn-up selected" id="upBtn">▲ Price goes UP</button>
+            <button type="button" class="btn btn-down" id="downBtn">▼ Price goes DOWN</button>
+          </div>
+          <button class="btn btn-blue full" id="tradeBtn">Place demo trade</button>
+          <p class="hint">A correct direction earns an illustrative 80% of the stake as demo profit. An incorrect direction loses the virtual stake. This is a simple practice simulation, not a real broker or investment product.</p>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="section-title">M-Pesa deposits</div>
+          <div class="mpesa">
+            <span class="soon">COMING LATER</span>
+            <h3 style="margin-top:9px">M-Pesa integration placeholder</h3>
+            <p>This demo does not accept payments. A future secure version would require a backend, Safaricom Daraja API credentials, payment confirmation and relevant legal/regulatory approvals.</p>
+            <button class="btn btn-blue full" id="mpesaBtn" type="button">M-Pesa deposits — not active</button>
+          </div>
+        </div>
+
+        <div class="notice"><strong>Important:</strong> TradeHub is an educational prototype. It does not connect to a broker, offer real trading, hold customer funds, or process deposits or withdrawals. All balances and results are virtual and stored only in this browser session.</div>
+      </aside>
+    </section>
+    <div class="footer">TRADEHUB DEMO · Built for practice · Not financial advice</div>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const START_BALANCE = 10000;
+  const PAYOUT = 0.80;
+  let balance = START_BALANCE, direction = "up", currentPrice = 1.08420;
+  let prices = Array.from({length:45}, (_,i)=>currentPrice + (Math.random()-.5)*.0015);
+  let trades = [], previousPrice = currentPrice;
+  const $ = id => document.getElementById(id);
+  const money = n => "KSh " + n.toLocaleString("en-KE",{minimumFractionDigits:2,maximumFractionDigits:2});
+  function toast(message){const el=$("toast");el.textContent=message;el.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.display="none",2800)}
+  function renderBalance(){$("balance").textContent=money(balance)}
+  function renderPrice(){
+    $("price").textContent=currentPrice.toFixed(5);
+    const pct=((currentPrice-previousPrice)/previousPrice)*100;
+    $("change").textContent=(pct>=0?"+":"")+pct.toFixed(3)+"%";
+    $("change").style.color=pct>=0?"#138a55":"#cf3e4e";
+  }
+  function drawChart(){
+    const canvas=$("chart"), rect=canvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+    canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);
+    const ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);
+    const w=rect.width,h=rect.height,pad=15,min=Math.min(...prices),max=Math.max(...prices),range=(max-min)||.0001;
+    ctx.strokeStyle="#e8eef7";ctx.lineWidth=1;
+    for(let i=1;i<4;i++){let y=pad+(h-pad*2)*i/4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+    ctx.beginPath();
+    prices.forEach((p,i)=>{const x=pad+(w-pad*2)*i/(prices.length-1),y=h-pad-(p-min)/range*(h-pad*2);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});
+    ctx.strokeStyle="#1769e0";ctx.lineWidth=2.5;ctx.lineJoin="round";ctx.lineCap="round";ctx.stroke();
+    const lastY=h-pad-(prices.at(-1)-min)/range*(h-pad*2);
+    ctx.lineTo(w-pad,lastY);ctx.lineTo(w-pad,h-pad);ctx.lineTo(pad,h-pad);ctx.closePath();
+    ctx.fillStyle="rgba(23,105,224,.08)";ctx.fill();
+  }
+  function renderTrades(){
+    const body=$("tradeRows");
+    if(!trades.length){body.innerHTML='<tr><td colspan="4" style="color:#8290a3;text-align:center">No demo trades yet. Place a practice trade to begin.</td></tr>';return}
+    body.innerHTML=trades.slice().reverse().map(t=>{
+      const status=t.status==="Pending"?'<span class="pending">Pending</span>':t.status==="Won"?'<span class="win">Won</span>':'<span class="loss">Lost</span>';
+      const result=t.status==="Pending"?"—":(t.status==="Won"?"+"+money(t.profit):"-"+money(t.stake));
+      return `<tr><td>${t.asset} · ${t.direction.toUpperCase()}</td><td>${money(t.stake)}</td><td>${result}</td><td>${status}</td></tr>`;
+    }).join("");
+  }
+  $("upBtn").addEventListener("click",()=>{direction="up";$("upBtn").classList.add("selected");$("downBtn").classList.remove("selected")});
+  $("downBtn").addEventListener("click",()=>{direction="down";$("downBtn").classList.add("selected");$("upBtn").classList.remove("selected")});
+  $("tradeBtn").addEventListener("click",()=>{
+    const stake=Number($("stake").value), duration=Number($("duration").value);
+    if(!Number.isFinite(stake)||stake<10){toast("Enter a stake of at least KSh 10.");return}
+    if(stake>balance){toast("Your virtual balance is too low. Reset the demo balance if needed.");return}
+    balance-=stake;renderBalance();
+    const trade={id:Date.now(),asset:$("asset").value,direction,stake,start:currentPrice,status:"Pending",profit:0};
+    trades.push(trade);renderTrades();toast("Demo trade placed. Waiting for simulated result…");
+    setTimeout(()=>{
+      const won=trade.direction==="up"?currentPrice>trade.start:currentPrice<trade.start;
+      if(won){trade.status="Won";trade.profit=stake*PAYOUT;balance+=stake+trade.profit}
+      else trade.status="Lost";
+      renderBalance();renderTrades();toast(won?"Demo trade won: "+money(trade.profit)+" virtual profit.":"Demo trade lost: virtual stake deducted.");
+    },duration*1000);
+  });
+  $("resetBtn").addEventListener("click",()=>{
+    if(trades.some(t=>t.status==="Pending")){toast("Wait for pending demo trades to finish before resetting.");return}
+    balance=START_BALANCE;trades=[];renderBalance();renderTrades();toast("Demo balance reset to KSh 10,000.");
+  });
+  $("historyBtn").addEventListener("click",()=>$("history").scrollIntoView({behavior:"smooth"}));
+  $("mpesaBtn").addEventListener("click",()=>toast("M-Pesa is not connected. This prototype cannot accept payments."));
+  $("asset").addEventListener("change",()=>{
+    const bases={"EUR/USD":1.08420,"GBP/USD":1.27150,"USD/JPY":149.250,"GOLD":2350.00};
+    currentPrice=bases[$("asset").value];previousPrice=currentPrice;
+    prices=Array.from({length:45},()=>currentPrice+(Math.random()-.5)*currentPrice*.0007);
+    renderPrice();drawChart();
+  });
+  function tick(){
+    previousPrice=currentPrice;
+    const asset=$("asset").value, scale=asset==="GOLD"?.00035:asset==="USD/JPY"?.00012:.00018;
+    currentPrice=Math.max(.0001,currentPrice+(Math.random()-.49)*scale*currentPrice);
+    prices.push(currentPrice);if(prices.length>45)prices.shift();
+    renderPrice();drawChart();
+  }
+  window.addEventListener("resize",drawChart);
+  renderBalance();renderPrice();renderTrades();drawChart();setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
